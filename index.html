@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Customizer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            gap: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* Left Side: Main Shirt Preview */
+        .preview-panel {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .preview-panel h2 {
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            color: #444;
+        }
+
+        .shirt-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1 / 1;
+            background: #fdfdfd;
+            border: 1px solid #eef2f5;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shirt-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Centering the heart design onto the shirt */
+        .design-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -45%); /* Adjusted slightly upward (-45%) to sit naturally on the chest chest center */
+            width: 22%; /* Scales nicely with the shirt size */
+            height: auto;
+            pointer-events: none; /* Allows clicks to pass through if needed */
+        }
+
+        /* Right Side: Asset / Random Position Panel */
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid #f0f2f5;
+            padding-left: 40px;
+            justify-content: center;
+        }
+
+        .sidebar h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .sidebar p {
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        /* Showcase box for the standalone asset */
+        .asset-box {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: #fafafa;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Placing the heart design at a "random" organic looking layout spot on the side */
+        .sidebar-design {
+            position: absolute;
+            top: 25%;
+            left: 30%;
+            width: 40%;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="preview-panel">
+            <h2>Product Mockup</h2>
+            <div class="shirt-container">
+                <img class="shirt-img" src="https://i.pinimg.com/1200x/27/b5/a1/27b5a1602087a7113d58118e357bdc54.jpg" alt="White T-Shirt">
+                
+                <img class="design-overlay" src="https://static.vecteezy.com/system/resources/previews/023/234/884/original/heart-shapes-in-red-colors-cute-and-romantic-decoration-for-love-design-concept-png.png" alt="Heart Design">
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3>Design Asset</h3>
+            <p>Active design layer sourced for the center printing matrix.</p>
+            
+            <div class="asset-box">
+                <img class="sidebar-design" src="https://static.vecteezy.com/system/resources/previews/023/234/884/original/heart-shapes-in-red-colors-cute-and-romantic-decoration-for-love-design-concept-png.png" alt="Heart Design Source">
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
