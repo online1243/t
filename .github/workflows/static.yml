@@ -1,43 +1,345 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shirt Design Matching Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+        body {
+            background-color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            overflow: hidden;
+        }
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+        h1 {
+            margin-bottom: 5px;
+            font-size: 1.6rem;
+            color: #2c3e50;
+            text-align: center;
+        }
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+        .instruction {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+        .game-container {
+            display: flex;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            gap: 30px;
+            max-width: 850px;
+            width: 95%;
+            position: relative;
+        }
 
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+        .preview-panel {
+            flex: 1.3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shirt-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1 / 1;
+            background: #fafafa;
+            border: 2px dashed #bdc3c7;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shirt-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .target-zone {
+            position: absolute;
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 90px;
+            border: 2px dashed rgba(231, 76, 60, 0.4);
+            border-radius: 50%;
+            background: rgba(231, 76, 60, 0.05);
+        }
+
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-left: 2px dashed #e2e8f0;
+            padding-left: 30px;
+        }
+
+        .source-box {
+            width: 100%;
+            height: 220px;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .draggable-heart {
+            width: 75px;
+            height: auto;
+            cursor: grab;
+            position: absolute;
+            z-index: 100;
+            touch-action: none;
+            transition: transform 0.1s ease;
+        }
+
+        .draggable-heart:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        /* --- PASSED ANIMATION SCREEN --- */
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .success-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-card {
+            text-align: center;
+            transform: scale(0.6);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-overlay.show .success-card {
+            transform: scale(1);
+        }
+
+        /* Animated Green Checkmark */
+        .checkmark-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #2ecc71;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+        }
+
+        .checkmark {
+            width: 40px;
+            height: 20px;
+            border-left: 5px solid white;
+            border-bottom: 5px solid white;
+            transform: rotate(-45deg);
+            margin-top: -5px;
+            animation: drawCheck 0.4s ease 0.3s forwards;
+            opacity: 0;
+        }
+
+        .success-card h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .success-card p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        /* Keyframes for animations */
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes drawCheck {
+            0% { opacity: 0; transform: scale(0.5) rotate(-45deg); }
+            100% { opacity: 1; transform: scale(1) rotate(-45deg); }
+        }
+
+        @media (max-width: 600px) {
+            .game-container { flex-direction: column; }
+            .sidebar { border-left: none; border-top: 2px dashed #e2e8f0; padding-left: 0; padding-top: 20px; }
+            .source-box { height: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>T-Shirt Fiting JOB Test</h1>
+    <p class="instruction">Finger se Heart ko uthao aur T-Shirt ke center par sahi jagah hold karke fit karo!  गलत फिट मत करना यक्यूकी ये मार्केट मे Sell होगी </p>
+
+    <div class="game-container">
+        
+        <div class="preview-panel">
+            <div class="shirt-container" id="drop-target">
+                <img class="shirt-img" src="https://i.pinimg.com/1200x/27/b5/a1/27b5a1602087a7113d58118e357bdc54.jpg" alt="White Shirt">
+                <div class="target-zone" id="target-zone"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="source-box" id="source-box">
+                <img class="draggable-heart" id="heart" src="https://static.vecteezy.com/system/resources/previews/023/234/884/original/heart-shapes-in-red-colors-cute-and-romantic-decoration-for-love-design-concept-png.png" alt="Heart Design">
+            </div>
+        </div>
+
+        <div class="success-overlay" id="success-screen">
+            <div class="success-card">
+                <div class="checkmark-circle">
+                    <div class="checkmark"></div>
+                </div>
+                <h2>TASK PASSED!</h2>
+                <p>Redirecting you now...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const heart = document.getElementById('heart');
+        const targetZone = document.getElementById('target-zone');
+        const successScreen = document.getElementById('success-screen');
+        const sourceBox = document.getElementById('source-box');
+
+        let isDragging = false;
+        let startX, startY;
+        let initialLeft, initialTop;
+
+        function setRandomStart() {
+            heart.style.position = 'absolute';
+            const randomTop = Math.floor(Math.random() * (sourceBox.clientHeight - 80));
+            const randomLeft = Math.floor(Math.random() * (sourceBox.clientWidth - 80));
+            heart.style.top = randomTop + 'px';
+            heart.style.left = randomLeft + 'px';
+        }
+
+        setRandomStart();
+
+        function startDrag(e) {
+            isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            startX = clientX;
+            startY = clientY;
+            initialLeft = heart.offsetLeft;
+            initialTop = heart.offsetTop;
+        }
+
+        function onDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const deltaX = clientX - startX;
+            const deltaY = clientY - startY;
+
+            heart.style.left = (initialLeft + deltaX) + 'px';
+            heart.style.top = (initialTop + deltaY) + 'px';
+        }
+
+        function stopDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+
+            const heartRect = heart.getBoundingClientRect();
+            const targetRect = targetZone.getBoundingClientRect();
+
+            const heartCenterX = heartRect.left + heartRect.width / 2;
+            const heartCenterY = heartRect.top + heartRect.height / 2;
+            const targetCenterX = targetRect.left + targetRect.width / 2;
+            const targetCenterY = targetRect.top + targetRect.height / 2;
+
+            const distance = Math.hypot(heartCenterX - targetCenterX, heartCenterY - targetCenterY);
+
+            // 45px ka magnetic trigger target range
+            if (distance < 45) {
+                const shirtContainer = document.getElementById('drop-target');
+                shirtContainer.appendChild(heart);
+                
+                heart.style.top = "48%"; 
+                heart.style.left = "50%";
+                heart.style.transform = "translate(-50%, -50%)";
+                heart.style.pointerEvents = "none";
+
+                // Animation overlay open hoga
+                setTimeout(() => {
+                    successScreen.classList.add('show');
+                    
+                    // 2 Seconds ka window animation dekhne ke liye, fir auto redirect to /passed
+                    setTimeout(() => {
+                        window.location.href = '/passed';
+                    }, 2000);
+
+                }, 300);
+            } else {
+                heart.style.transition = "all 0.3s ease";
+                setRandomStart();
+                setTimeout(() => heart.style.transition = "none", 300);
+            }
+        }
+
+        // Touch & Mouse Event Triggers
+        heart.addEventListener('touchstart', startDrag);
+        window.addEventListener('touchmove', onDrag, { passive: false });
+        window.addEventListener('touchend', stopDrag);
+
+        heart.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', onDrag);
+        window.addEventListener('mouseup', stopDrag);
+    </script>
+
+</body>
+</html>
